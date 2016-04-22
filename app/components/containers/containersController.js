@@ -1,6 +1,6 @@
 angular.module('containers', [])
-    .controller('ContainersController', ['$scope', 'Container', 'Settings', 'Messages', 'ViewSpinner',
-        function ($scope, Container, Settings, Messages, ViewSpinner) {
+    .controller('ContainersController', ['$scope', '$http', 'Container', 'Settings', 'Messages', 'ViewSpinner',
+        function ($scope, $http, Container, Settings, Messages, ViewSpinner) {
             $scope.sortType = 'Created';
             $scope.sortReverse = true;
             $scope.toggle = false;
@@ -56,18 +56,34 @@ angular.module('containers', [])
                             });
                         }
                         else {
-                            counter = counter + 1;
-                            action({id: c.Id}, function (d) {
-                                Messages.send("Container " + msg, c.Id);
-                                var index = $scope.containers.indexOf(c);
-                                complete();
-                            }, function (e) {
-                                Messages.error("Failure", e.data);
-                                complete();
-                            });
-
+                            if(action == Container.scan){
+                                alert("test: scan function activated")
+                                var request_string = 'http://10.10.10.11:9999/scan/' + c.Id
+                                console.log(request_string)
+                                $http.get(request_string).then(function(result){
+                                    console.log(result);
+                                    alert('Container scnaed, please go to elastic plugin to see result');
+                                });
+                                action({id: c.Id}, function (d) {
+                                    Messages.send("Container " + msg, c.Id);
+                                    var index = $scope.containers.indexOf(c);
+                                    complete();
+                                }, function (e) {
+                                    Messages.error("Failure", e.data);
+                                    complete();
+                                });
+                            }
+                            else{
+                                action({id: c.Id}, function (d) {
+                                    Messages.send("Container " + msg, c.Id);
+                                    var index = $scope.containers.indexOf(c);
+                                    complete();
+                                }, function (e) {
+                                    Messages.error("Failure", e.data);
+                                    complete();
+                                });
+                            }
                         }
-
                     }
                 });
                 if (counter === 0) {
@@ -113,6 +129,9 @@ angular.module('containers', [])
             $scope.removeAction = function () {
                 batch($scope.containers, Container.remove, "Removed");
             };
+            $scope.scanAction = function () {
+                batch($scope.containers, Container.scan, "Scaned");
+                };
 
             update({all: Settings.displayAll ? 1 : 0});
         }]);

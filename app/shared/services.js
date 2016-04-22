@@ -10,6 +10,7 @@ angular.module('dockerui.services', ['ngResource', 'ngSanitize'])
             get: {method: 'GET', params: {action: 'json'}},
             start: {method: 'POST', params: {id: '@id', action: 'start'}},
             stop: {method: 'POST', params: {id: '@id', t: 5, action: 'stop'}},
+            scan: {method: 'POST', params: {id: '@id', action:'scan'} },
             restart: {method: 'POST', params: {id: '@id', t: 5, action: 'restart'}},
             kill: {method: 'POST', params: {id: '@id', action: 'kill'}},
             pause: {method: 'POST', params: {id: '@id', action: 'pause'}},
@@ -24,8 +25,9 @@ angular.module('dockerui.services', ['ngResource', 'ngSanitize'])
     .factory('ContainerCommit', ['$resource', '$http', 'Settings', function ContainerCommitFactory($resource, $http, Settings) {
         'use strict';
         // http://docs.docker.com/reference/api/docker_remote_api_<%= remoteApiVersion %>/#create-a-new-image-from-a-container-s-changes
-        return {
+         return {
             commit: function (params, callback) {
+                console.log(params);
                 $http({
                     method: 'POST',
                     url: Settings.url + '/commit',

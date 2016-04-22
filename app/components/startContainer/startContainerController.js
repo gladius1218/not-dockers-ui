@@ -1,6 +1,6 @@
 angular.module('startContainer', ['ui.bootstrap'])
-    .controller('StartContainerController', ['$scope', '$routeParams', '$location', 'Container', 'Messages', 'containernameFilter', 'errorMsgFilter',
-        function ($scope, $routeParams, $location, Container, Messages, containernameFilter, errorMsgFilter) {
+    .controller('StartContainerController', ['$scope', '$http',  '$routeParams', '$location', 'Container', 'Messages', 'containernameFilter', 'errorMsgFilter',
+        function ($scope, $http, $routeParams, $location, Container, Messages, containernameFilter, errorMsgFilter) {
             $scope.template = 'app/components/startContainer/startcontainer.html';
 
             Container.query({all: 1}, function (d) {
@@ -55,6 +55,25 @@ angular.module('startContainer', ['ui.bootstrap'])
             $scope.create = function () {
                 // Copy the config before transforming fields to the remote API format
                 var config = angular.copy($scope.config);
+                
+                var img_name = $routeParams.tag
+                var img_name = img_name.split('129.10.3.149:5000/').slice(-1)
+                console.log('searching:' + img_name);
+                var search_str = 'http://10.10.10.11:9002/get_judge_res/' + img_name;
+                console.log(search_str); 
+                $http.get(search_str)
+                .then(function(result){
+                    console.log(result);
+                    console.log(result.data == "Error: index do not exist");
+		    if(result.data == "Error: index do not exist" || result.data.total == 0 || result.data.total == '0'){
+                        alert('image is clean');
+                    }
+                    else{
+                        alert(result.data.total + ' suspicious files, please go to elasticsearch plugins for more details')
+                        console.log(result.data.file_list);
+                        alert(result.data.file_list);
+                    }
+                });
 
                 config.Image = $routeParams.id;
 
@@ -125,6 +144,7 @@ angular.module('startContainer', ['ui.bootstrap'])
                 var s = $scope;
                 Container.create(config, function (d) {
                     if (d.Id) {
+                        //check image, if passed, continue, else return
                         var reqBody = config.HostConfig || {};
                         reqBody.id = d.Id;
                         ctor.start(reqBody, function (cd) {

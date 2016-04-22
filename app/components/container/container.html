@@ -37,6 +37,10 @@
                 ng-show="container.State.Running && !container.State.Paused">Pause
         </button>
         <button class="btn btn-success"
+                ng-click="scan()">Scan
+        </button>
+
+        <button class="btn btn-success"
                 ng-click="unpause()"
                 ng-show="container.State.Running && container.State.Paused">Unpause
         </button>
