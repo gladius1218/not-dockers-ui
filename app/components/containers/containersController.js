@@ -57,7 +57,6 @@ angular.module('containers', [])
                         }
                         else {
                             if(action == Container.scan){
-                                alert("test: scan function activated")
                                 var request_string = 'http://10.10.10.11:9999/scan/' + c.Id
                                 console.log(request_string)
                                 $http.get(request_string).then(function(result){
